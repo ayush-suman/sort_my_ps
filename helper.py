@@ -17,8 +17,6 @@ def load_problem_bank(filename):
     for row in rows:
         location = row.find("td", {"id": "lOCATION"}).text
         company_name = row.find("td", {"id": "stationname"}).text.strip()
-        # last_index = company_name.rfind('(' + location + ')')
-        # company = company_name[:last_index]
         company = company_name.removesuffix('(' + location + ')')
         industry_name = row.find("td", {"id": "Industry"}).text.strip()
         industry = Industry(industry_name)
@@ -51,13 +49,19 @@ class Sortable:
 
     def apply_sorting(self, stations_list: list[Station]):
         length = len(self.stations)
+        indices = list(range(length))
         print("Total Station Count: " + str(length))
         for station in stations_list:
             index = self.__search__(station.get_name())
             if index != -1:
+                indices.remove(index)
                 i = len(self.__sortable_nav__.find_all("li")) + 1
                 self.stations[index].div.span.string = str(i)
                 self.__sortable_nav__.append(self.stations[index])
+        for index in indices:
+            i = len(self.__sortable_nav__.find_all("li")) + 1
+            self.stations[index].div.span.string = str(i)
+            self.__sortable_nav__.append(self.stations[index])
 
         
     def save(self, filename):

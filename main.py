@@ -18,6 +18,9 @@ stations_list = sort_by_industry(stations_list, [
     Industry.CHEMICAL
 ])
 stations_list = sort_by_stipend(stations_list)
+# stations_list = sort_by_location(stations_list, ["Bangalore", "Mumbai"])
+
+# Do not change the line below (Line No. 24)
 stations_list = flatten(stations_list)
 
 # Load sortable Stations, apply sorting order from Stations_List, save
