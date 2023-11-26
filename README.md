@@ -1,7 +1,7 @@
 # What it does
 Sort My PS quickly sorts your PS preference list based on the following parameters - 
-1. Industry preference (IT, Electronics, Chemical etc.
-2. Stipend (If you choose to use sorting based in stipend)
+1. Industry preference (IT, Electronics, Chemical etc.)
+2. Stipend (If you choose to use sorting based on stipend)
 3. Location preference (Bangalore, Mumbai, Chennai etc.)
 
 Using this, you can update your entire preference list in less than a minute.
