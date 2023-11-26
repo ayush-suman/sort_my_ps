@@ -45,7 +45,7 @@ class Sortable:
                 print("Fuzzy matched " + station.find('span').text + " with " + name)
                 return index
         print("NOT FOUND: " + name)
-        return index
+        return -1
 
     def apply_sorting(self, stations_list: list[Station]):
         length = len(self.stations)
