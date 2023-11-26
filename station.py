@@ -1,42 +1,50 @@
 from enum import Enum
 from dataclasses import dataclass
 
-class Industry(str, Enum):
-    CHEMICAL = 'Chemical'
-    ELECTRONICS = 'Electronics'
-    FINNMGMT = 'Finance and Mgmt'
-    HEALTHCARE = 'Health Care'
-    INFRASTRUCTURE = 'Infrastructure'
-    IT = 'IT'
-    MECHANICAL = 'Mechanical'
-    OTHERS = 'Others'
-    NONE = ''
-    
-    # def from_name(name):
-    #     match name:
-    #         case 'Chemical': return Industry.CHEMICAL
-    #         case 'Electronics': return Industry.ELECTRONICS
-    #         case 'Finance and Mgmt': return Industry.FINNMGMT
-    #         case 'Health Care': return Industry.HEALTHCARE
-    #         case 'Infrastructure': return Industry.INFRASTRUCTURE
-    #         case 'IT': return Industry.IT
-    #         case 'Mechanical': return Industry.MECHANICAL
-    #         case _: return Industry.OTHERS
+class IndustryMeta(type):
+    def __init__(self, name, bases, dct):
+        self.CHEMICAL = self('Chemical')
+        self.ELECTRONICS = self('Electronics')
+        self.FINNMGMT = self('Finance and Mgmt')
+        self.HEALTHCARE = self('Health Care')
+        self.INFRASTRUCTURE = self('Infrastructure')
+        self.IT = self('IT')
+        self.MECHANICAL = self('Mechanical')
+        self.OTHERS = self('Others')
+        self.NONE = self('')
 
-    # def to_name(self):
-    #     match self.value:
-    #         case 1: return 'Chemical'
-    #         case 2: return 'Electronics'
-    #         case 3: return 'Finance and Mgmt'
-    #         case 4: return 'Health Care'
-    #         case 5: return 'Infrastructure'
-    #         case 6: return 'IT'
-    #         case 7: return 'Mechanical'
-    #         case 8: return 'Others'
+
+class Industry(metaclass=IndustryMeta):
+    def __init__(self, value: str):
+        if value is None:
+            raise ValueError('Industry needs to be constructed with a value')
+        self._value = value
+
+    @property
+    def value(self):
+        return self._value
+    
+    def __eq__(self, other):
+        for value in self.value.split('|'):
+            if value == other.value:
+                return True
+        return False
+
+    
+    def __add__(self, other):
+        return Industry(self.value + '|' + other.value)
+    
+    def __or__(self, other):
+        return Industry(self.value + '|' + other.value)
+    
+    def __and__(self, other):
+        return Industry(self.value + '|' + other.value)
+
 
 
 @dataclass
 class Station(object):
+
     location: str
     company: str
     industry: Industry

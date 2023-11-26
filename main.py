@@ -7,16 +7,12 @@ stations_list = load_problem_bank('problem_bank.html')
 
 # Apply sorting. Sorting applied earlier will have precedence over the latter.
 stations_list = sort_by_industry(stations_list, [
-    Industry.IT, 
-    Industry.FINNMGMT, 
+    Industry.IT | Industry.NONE | Industry.FINNMGMT, 
     Industry.ELECTRONICS, 
-    Industry.INFRASTRUCTURE, 
     Industry.HEALTHCARE, 
-    Industry.MECHANICAL, 
-    Industry.NONE, 
-    Industry.OTHERS, 
-    Industry.CHEMICAL
+    Industry.OTHERS | Industry.MECHANICAL | Industry.INFRASTRUCTURE |Industry.CHEMICAL
 ])
+
 stations_list = sort_by_stipend(stations_list)
 # stations_list = sort_by_location(stations_list, ["Bangalore", "Mumbai"])
 
