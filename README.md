@@ -8,4 +8,6 @@
 4. Modify lines 9 to 21 as per your preference in _main.py_
 5. Run `python main.py`
 
-Once you run this, you should get a new file _ps_modified.html_ in your directory. Copy the content of this file, inspect element of your PS portal Preferences page and replace the html code there. Click on *Save All Preferences* and you are done.
+Once you run this, you should get a new file _ps_modified.html_ in your directory. Copy entire list of `li` elements from this file (starts from lin 555), inspect element of your PS portal Preferences page and replace the `li` elements (found inside `ul` with id='sortable_nav'). 
+
+Click on *Save All Preferences* and you are done!
