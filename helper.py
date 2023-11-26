@@ -1,6 +1,7 @@
 import os
 from bs4 import BeautifulSoup as bs
 from station import Station, Industry
+from thefuzz import fuzz
 
 
 def load_problem_bank(filename):
@@ -14,12 +15,13 @@ def load_problem_bank(filename):
     stations_list = []
 
     for row in rows:
+        location = row.find("td", {"id": "lOCATION"}).text
         company_name = row.find("td", {"id": "stationname"}).text.strip()
-        last_index = company_name.rfind('(')
-        company = company_name[:last_index]
+        # last_index = company_name.rfind('(' + location + ')')
+        # company = company_name[:last_index]
+        company = company_name.removesuffix('(' + location + ')')
         industry_name = row.find("td", {"id": "Industry"}).text.strip()
-        industry = Industry.from_name(industry_name)
-        location = row.find("td", {"id": "lOCATION"}).text.strip()
+        industry = Industry(industry_name)
         stipend = int(row.find("td", {"id": "stipend"}).text.strip())
         station = Station(company = company, industry = industry, location = location, stipend = stipend)
         stations_list.append(station)
@@ -29,36 +31,38 @@ def load_problem_bank(filename):
 
 class Sortable:
     def __init__(self, soup):
-        self.soup = soup
-        self.sortable_nav = self.soup.find("form").find("ul", {"id": "sortable_nav"})
-        self.stations = self.sortable_nav.find_all("li")
-        self.sortable_nav.clear()
+        self.__soup__ = soup
+        self.__sortable_nav__ = self.__soup__.find("form").find("ul", {"id": "sortable_nav"})
+        self.stations = self.__sortable_nav__.find_all("li")
+        self.__sortable_nav__.clear()
 
 
-    def __append__(self, name, start = 0, end = -1):
-        if end < 0: 
-            end += len(self.stations)
-        
-        if end >= start:
-            index = (start + end) // 2
-            if self.stations[index].find('span').text.strip() == name:
-                i = len(self.sortable_nav.find_all("li")) + 1
-                self.stations[index].div.span.string = str(i)
-                self.sortable_nav.append(self.stations[index])
-            elif self.stations[index].find('span').text.strip() > name:
-                self.__append__(name, start, index - 1)
-            else:
-                self.__append__(name, index + 1, end)
-        
+    def __search__(self, name) -> int:  
+        for index, station in enumerate(self.stations):
+            if station.find('span').text == name:
+                return index
+        # Use slower Fuzzy match if not found
+        for index, station in enumerate(self.stations):
+            if fuzz.ratio(station.find('span').text, name) > 95:
+                print("Fuzzy matched " + station.find('span').text + " with " + name)
+                return index
+        print("NOT FOUND: " + name)
+        return index
 
     def apply_sorting(self, stations_list: list[Station]):
+        length = len(self.stations)
+        print("Total Station Count: " + str(length))
         for station in stations_list:
-            self.__append__(station.get_name())
+            index = self.__search__(station.get_name())
+            if index != -1:
+                i = len(self.__sortable_nav__.find_all("li")) + 1
+                self.stations[index].div.span.string = str(i)
+                self.__sortable_nav__.append(self.stations[index])
 
         
     def save(self, filename):
         with open(filename, "wb") as f_output:
-            f_output.write(self.soup.prettify("utf-8"))
+            f_output.write(self.__soup__.prettify("utf-8"))
 
 
 def get_sortable_stations(filename):
