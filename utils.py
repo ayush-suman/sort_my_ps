@@ -11,3 +11,9 @@ def index_of_best_match(value, array, tolerance = 0.6):
 
     return index
 
+
+def get_index(array, value):
+    try:
+        return array.index(value)
+    except:
+        return len(array)
