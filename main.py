@@ -9,7 +9,7 @@ stations_list = load_problem_bank('problem_bank.html')
 stations_list = sort_by_industry(stations_list, [
     Industry.IT + Industry.NONE + Industry.FINNMGMT, 
     Industry.ELECTRONICS, 
-    #Industry.HEALTHCARE, 
+    Industry.HEALTHCARE, 
     Industry.OTHERS + Industry.MECHANICAL + Industry.INFRASTRUCTURE + Industry.CHEMICAL
 ])
 
