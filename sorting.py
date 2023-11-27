@@ -1,13 +1,20 @@
 import itertools
 from fuzz_match import index_of_best_match
 
+def _get_index(order, station):
+    try:
+        return order.index(station.industry)
+    except:
+        return len(order)
+    
+
 def sort_by_industry(stations_list, order):
     for stations in stations_list:
         if isinstance(stations, list):
             stations = sort_by_industry(stations, order)
         else:
-            stations_list.sort(key = lambda station: order.index(station.industry))
-            stations_list = [list(g) for k, g in itertools.groupby(stations_list, lambda station: order.index(station.industry))]
+            stations_list.sort(key = lambda station: _get_index(order, station))
+            stations_list = [list(g) for k, g in itertools.groupby(stations_list, lambda station: _get_index(order, station))]
             break
     return stations_list
 
