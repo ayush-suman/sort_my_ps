@@ -1,6 +1,7 @@
 import os
 from bs4 import BeautifulSoup as bs
 from station import Station, Industry
+from sorting import StationsList
 from thefuzz import fuzz
 
 
@@ -24,7 +25,7 @@ def load_problem_bank(filename):
         station = Station(company = company, industry = industry, location = location, stipend = stipend)
         stations_list.append(station)
 
-    return stations_list
+    return StationsList(stations_list)
 
 
 class Sortable:
@@ -47,11 +48,14 @@ class Sortable:
         print("NOT FOUND: " + name)
         return -1
 
+
     def apply_sorting(self, stations_list: list[Station]):
         length = len(self.stations)
         indices = list(range(length))
         print("Total Station Count: " + str(length))
         for station in stations_list:
+            if type(station) is not Station:
+                raise ValueError("Stations List not flattened")
             index = self.__search__(station.get_name())
             if index != -1:
                 indices.remove(index)

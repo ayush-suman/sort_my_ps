@@ -1,5 +1,6 @@
-from enum import Enum
 from dataclasses import dataclass
+from thefuzz import fuzz
+
 
 class IndustryMeta(type):
     def __init__(self, name, bases, dct):
@@ -24,6 +25,11 @@ class Industry(metaclass=IndustryMeta):
     def value(self):
         return self._value
     
+    
+    def __str__(self) -> str:
+        return self._value
+    
+    
     def __eq__(self, other):
         for value in self.value.split('|'):
             if value == other.value:
@@ -44,11 +50,13 @@ class Industry(metaclass=IndustryMeta):
 
 @dataclass
 class Station(object):
-
     location: str
     company: str
     industry: Industry
     stipend: int
+
+    def __eq__(self, __value: object) -> bool:
+        return isinstance(__value, Station) and self.company == __value.company and self.industry == __value.industry and self.stipend == __value.stipend and self.location == __value.location
     
     def get_name(self):
         if self.industry == Industry.NONE:
@@ -56,6 +64,10 @@ class Station(object):
         if self.industry == Industry.ELECTRONICS:
             return self.industry.value + '  -' + self.company + ', ' + self.location
         return self.industry.value + '-' + self.company + ', ' + self.location
+    
+
+    def ismatch(self, name) -> bool:
+        return fuzz.ratio(self.get_name(), name) > 0.9
     
 
 

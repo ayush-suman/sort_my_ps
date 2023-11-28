@@ -1,45 +1,115 @@
-import itertools
-from utils import index_of_best_match, get_index
+from itertools import groupby, repeat
+from typing import Iterable
+from utils import get_best_match_index, get_order_index, get_bracket_index
+from station import Station, Industry
+
+
+class StationsListMeta(type):
+    def __init_subclass__(cls, iterable) -> None:
+        return super().__init_subclass__()
+
+
+class StationsList(list[StationsListMeta | Station], metaclass=StationsListMeta):
+    def __init__(self, iterable: Iterable[StationsListMeta]):
+        super().__init__(iterable)
+
+
+    def copy(self):
+        return StationsList(self.__iter__())
     
 
-def sort_by_industry(stations_list, order):
-    for stations in stations_list:
-        if isinstance(stations, list):
-            stations = sort_by_industry(stations, order)
+    def __update__(self, iter: list[StationsListMeta | Station]):
+        self.clear()
+        self.extend(iter)
+
+
+    def remove(self, station: Station):
+        for stations in self:
+            if isinstance(stations, Station):
+                if station in self:
+                    super().remove(station)
+            else:
+                stations.remove(station)
+                
+
+    def insert(self, indices: int | list[int], station: Station):
+        if isinstance(indices, int):
+            assert(len(self) == 0 or isinstance(self[0], Station))
+            super().insert(indices, station)
         else:
-            stations_list.sort(key = lambda station: get_index(order, station.industry))
-            stations_list = [list(g) for k, g in itertools.groupby(stations_list, lambda station: get_index(order, station.industry))]
-            break
-    return stations_list
+            index = indices.pop(0)
+            if len(indices) > 1:
+                self[index].insert(indices, station)
+            else:
+                self[index].insert(indices[0], station)
 
 
-def sort_by_stipend(stations_list):
-    for stations in stations_list:
-        if isinstance(stations, list):
-            stations = sort_by_stipend(stations)
-        else:
-            stations_list.sort(key = lambda station: station.stipend, reverse=True) 
-            stations_list = [list(g) for k, g in itertools.groupby(stations_list, lambda station: station.stipend)]
-            break
-    return stations_list
+    def add_to_top(self, stations: list[Station]):
+        if len(stations) == 0:
+            return
+        for station in stations: 
+            self.remove(station)
+        self.__update__([StationsList(stations), self.copy()])
 
 
-def sort_by_location(stations_list, locations):
-    for stations in stations_list:
-        if isinstance(stations, list):
-            stations = sort_by_location(stations, locations)
-        else:
-            stations_list.sort(key = lambda station: index_of_best_match(station.location, locations))
-            stations_list = [list(g) for k, g in itertools.groupby(stations_list, lambda station: index_of_best_match(station.location, locations))]
-            break
-    return stations_list
+    def pick_favourites(self, favourites: list[str]):
+        picks = StationsList(repeat(StationsList([]), len(favourites)))
+        for stations in self:
+            if isinstance(stations, StationsList):
+                stations.pick_favourites(favourites)
+            else:
+                index = get_best_match_index(stations.company, favourites, tolerance=90)
+                if index < len(favourites):
+                    print("Added " + stations.get_name() + " as favourites")
+                    picks[index].append(stations)
+        picks.flatten()
+        for pick in picks:
+            self.remove(pick)
+        self.__update__([picks, self.copy()])
+    
 
 
-def flatten(stations_list):
-    flattened_list = []
-    for stations in stations_list:
-        if isinstance(stations, list):
-            flattened_list += stations
-        else:
-            return stations_list
-    return flatten(flattened_list)
+    def sort_by_industry(self, order: list[Industry]):
+        for stations in self:
+            if isinstance(stations, StationsList):
+                stations.sort_by_industry(order)
+            else:
+                self.sort(key = lambda station: get_order_index(order, station.industry))
+                self.__update__([StationsList(g) for k, g in groupby(self, lambda station: get_order_index(order, station.industry))])
+                return
+
+
+    def sort_by_stipend(self, brackets: list[int] = None):
+        for stations in self:
+            if isinstance(stations, StationsList):
+                stations.sort_by_stipend(brackets)
+            else:
+                self.sort(key = lambda station: station.stipend, reverse=True) 
+                if brackets is None:
+                    self.__update__(StationsList([StationsList(g) for k, g in groupby(self, lambda station: station.stipend)]))
+                else:
+                    brackets.sort()
+                    self.__update__([StationsList(g) for k, g in groupby(self, lambda station: get_bracket_index(brackets, station.stipend))])
+                return
+
+
+    def sort_by_location(self, locations: list[str]):
+        for stations in self:
+            if isinstance(stations, StationsList):
+                stations.sort_by_location(locations)
+            else:
+                self.sort(key = lambda station: get_best_match_index(station.location, locations))
+                self.__update__([StationsList(g) for k, g in groupby(self, lambda station: get_best_match_index(station.location, locations))])
+                return
+
+
+    def flatten(self):
+        flattened_list = []
+        for stations in self:
+            if isinstance(stations, StationsList):
+                stations.flatten()
+                flattened_list.extend(stations)
+            else:
+                flattened_list.append(stations)
+        self.__update__(flattened_list)
+
