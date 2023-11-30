@@ -5,7 +5,7 @@ from sorting import StationsList
 from thefuzz import fuzz
 
 
-def load_problem_bank(filename):
+def load_problem_bank(filename) -> StationsList:
     base = os.path.dirname(os.path.abspath(__file__))
     problem_bank = open(os.path.join(base, filename))
 
@@ -73,7 +73,7 @@ class Sortable:
             f_output.write(self.__soup__.prettify("utf-8"))
 
 
-def get_sortable_stations(filename):
+def get_sortable_stations(filename) -> Sortable:
     base = os.path.dirname(os.path.abspath(__file__))
     ps = open(os.path.join(base, filename))
     soup = bs(ps, 'html.parser')

@@ -1,6 +1,6 @@
 from thefuzz import fuzz
 
-def get_best_match_index(value, array, tolerance = 60):
+def get_best_match_index(value, array, tolerance = 60) -> int:
     max_ratio = tolerance
     index = len(array)
     for i, a in enumerate(array):
@@ -12,14 +12,14 @@ def get_best_match_index(value, array, tolerance = 60):
     return index
 
 
-def get_order_index(array, value):
+def get_order_index(array, value) -> int:
     try:
         return array.index(value)
     except:
         return len(array)
     
 
-def get_bracket_index(array, value):
+def get_bracket_index(array, value) -> int:
     def search_between(start, end):    
         if start <= end:
             index = (start + end) // 2

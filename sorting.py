@@ -85,9 +85,7 @@ class StationsList(list[StationsListMeta | Station], metaclass=StationsListMeta)
                 stations.sort_by_stipend(brackets)
             else:
                 self.sort(key = lambda station: station.stipend, reverse=True) 
-                if brackets is None:
-                    self.__update__(StationsList([StationsList(g) for k, g in groupby(self, lambda station: station.stipend)]))
-                else:
+                if brackets is not None:
                     brackets.sort()
                     self.__update__([StationsList(g) for k, g in groupby(self, lambda station: get_bracket_index(brackets, station.stipend))])
                 return

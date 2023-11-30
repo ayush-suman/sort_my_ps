@@ -58,7 +58,7 @@ class Station(object):
     def __eq__(self, __value: object) -> bool:
         return isinstance(__value, Station) and self.company == __value.company and self.industry == __value.industry and self.stipend == __value.stipend and self.location == __value.location
     
-    def get_name(self):
+    def get_name(self) -> str:
         if self.industry == Industry.NONE:
             return self.company + ', ' + self.location
         if self.industry == Industry.ELECTRONICS:

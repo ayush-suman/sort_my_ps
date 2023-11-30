@@ -9,10 +9,8 @@ stations_list.pick_favourites(['Cenizas Labs'])
 
 # Separates list into two brackets - stipend > 25000 pushed to top and stipend < 25000 (inclusive) pushed to the bottom
 # You can create multiple brackets such as - [75000, 30000] will create brackets > 75000, < 75000 (inclusive) but > 30000, < 30000 (inclusive)
-# If no value is passed to this function, it simply sorts the stations based on the stipend. Since this creates a bracket for every stipend offered, 
-# further sort will be applied to those multiple small brackets created, and hence will be undesirable. If you wish to apply sorting by stipend 
-# without brackets, apply this sort after you apply other sorts (by industry, by location etc.).
-stations_list.sort_by_stipend([25000]) 
+# If no value is passed to this function, it simply sorts the stations based on the stipend wihtout seggregating them into different brackets.
+stations_list.sort_by_stipend([35000]) 
 
 # Sorting applied earlier will have precedence over the latter. Since the list has been seggregated into two stipend brackets, this sort will arrange
 # the list such that the upper part of the list will have all IT or FINANCE or NONE specified stations with stipend > 25000 first, then ELELCTRONICS (> 25000),
@@ -22,7 +20,8 @@ stations_list.sort_by_industry([
     Industry.IT + Industry.NONE + Industry.FINNMGMT, 
     Industry.ELECTRONICS, 
     Industry.HEALTHCARE, 
-    Industry.OTHERS + Industry.MECHANICAL + Industry.INFRASTRUCTURE + Industry.CHEMICAL
+    Industry.OTHERS,
+    Industry.MECHANICAL + Industry.INFRASTRUCTURE + Industry.CHEMICAL
 ])
 
 # Location wise sorting has tolerance for spelling errors
