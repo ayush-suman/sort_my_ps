@@ -33,4 +33,10 @@ def get_bracket_index(array, value) -> int:
         else:
             return start
     return search_between(0, len(array) - 1)
-    
+   
+
+def get_bucket_index(array, value) -> int:
+    for i, a in enumerate(array):
+        if a(value): 
+            return i
+    return len(array)

@@ -1,2 +1,4 @@
 thefuzz
 BeautifulSoup4
+selenium
+openai

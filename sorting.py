@@ -1,6 +1,6 @@
 from itertools import groupby, repeat
-from typing import Iterable
-from utils import get_best_match_index, get_order_index, get_bracket_index
+from typing import Iterable, Callable
+from utils import get_best_match_index, get_order_index, get_bracket_index, get_bucket_index
 from station import Station, Industry
 
 
@@ -23,6 +23,28 @@ class StationsList(list[StationsListMeta | Station], metaclass=StationsListMeta)
         self.extend(iter)
 
 
+    def get(self, indices: int | list[int]) -> StationsList | Station:
+        if isinstance(indices, int):
+            return self[indices]
+        else:
+            index = indices.pop(0)
+            if len(indices > 1):
+                return self[index].get(indices)
+            else:
+                return self[index][indices[0]]
+
+
+    def pop(self, indices: int | List[int]) -> StationsList | Station:
+        if isinstance(indices, int):
+            return super().pop(indices)
+        else:
+            index = indices.pop(0)
+            if len(indices) > 1:
+                return self[index].pop(indices)
+            else:
+                return self[index].pop(indices[0])
+
+
     def remove(self, station: Station):
         for stations in self:
             if isinstance(stations, Station):
@@ -30,11 +52,10 @@ class StationsList(list[StationsListMeta | Station], metaclass=StationsListMeta)
                     super().remove(station)
             else:
                 stations.remove(station)
-                
+
 
     def insert(self, indices: int | list[int], station: Station):
         if isinstance(indices, int):
-            assert(len(self) == 0 or isinstance(self[0], Station))
             super().insert(indices, station)
         else:
             index = indices.pop(0)
@@ -98,6 +119,15 @@ class StationsList(list[StationsListMeta | Station], metaclass=StationsListMeta)
             else:
                 self.sort(key = lambda station: get_best_match_index(station.location, locations))
                 self.__update__([StationsList(g) for k, g in groupby(self, lambda station: get_best_match_index(station.location, locations))])
+                return
+
+    def sort_into_custom_buckets(self, buckets: list[Callable[[Station], bool]]):
+        for stations in self:
+            if isinstance(stations, StationsList):
+                stations.sort_by_custom_buckets(buckets)
+            else:
+                self.sort(key = lambda station: get_bucket_index(bucket, station))
+                self.__update__([StationsList(g) for k, g in groupby(lambda station: get_bucket_index(buckets, station))])
                 return
 
 
